@@ -4,11 +4,12 @@ package com.example.hw4.repository
 import com.example.hw4.DTO.Post
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.EMPTY_REQUEST
+import java.io.IOException
+import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 class PostRepositoryImpl : PostRepository {
@@ -23,16 +24,34 @@ class PostRepositoryImpl : PostRepository {
         private val jsonType = "application/json".toMediaType()
     }
 
-    override fun getAll(): List<Post> {
+    override fun getAll(callback: PostRepository.PostCallBack){
         val request: Request = Request.Builder()
             .url("${BASE_URL}/api/slow/posts")
             .build()
 
-        return client.newCall(request)
-            .execute()
-            .let { it.body?.string() ?: throw RuntimeException("body is null") }
-            .let { gson.fromJson(it, typeToken.type)
-            }
+       client.newCall(request)
+            .enqueue(object : Callback{
+                override fun onFailure(call: Call, e: IOException) {
+                    callback.onError(e)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (!response.isSuccessful) {
+                     callback.onError(Exception(response.message))
+                        return
+                    }
+
+                    val data: List<Post>? = response.body?.string()?.let {
+                        gson.fromJson(it, typeToken.type)
+                    }
+                    data ?: kotlin.run {
+                        callback.onError(Exception("body is null"))
+                        return
+                    }
+                    callback.onSuccess(data)
+                }
+
+            })
     }
 
 
