@@ -50,13 +50,7 @@ class FCMService : FirebaseMessagingService() {
                 }
             }
 
-        }// catch (e: IllegalArgumentException) {
-         //   val notification = NotificationCompat.Builder(this, channelId)
-            //       .setSmallIcon(R.drawable.ic_notification)
-            //       .setContentTitle(getString(R.string.not_nown_action_notification))
-            //       .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            //       .build()
-            //   NotificationManagerCompat.from(this).notify(Random.nextInt(100000), notification)
+        }
         catch (e: RuntimeException) {
             println(R.string.not_nown_action_notification)
             return
