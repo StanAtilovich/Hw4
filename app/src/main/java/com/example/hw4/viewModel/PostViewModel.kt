@@ -111,8 +111,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             repository.likedByIdAsync(id, likedByMe, object : PostRepository.Callback<Post> {
                 override fun onSuccess(posts: Post) {
                     _postCreated.postValue(Unit)
-                }
-
+                    _data.value?.copy(posts = _data.value?.posts.orEmpty()
+                        .map {
+                            if (it.id != id) {
+                                it
+                            } else {
+                                posts
+                            }
+                        }
+                    ) }
                 override fun onError(e: Exception) {
                     _data.postValue(FeedModel(error = true))
                 }
