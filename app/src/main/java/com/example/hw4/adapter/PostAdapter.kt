@@ -15,7 +15,6 @@ import com.example.hw4.R
 import com.example.hw4.databinding.CardPostBinding
 
 
-
 interface OnInteractionListener {
     fun onLike(post: Post) {}
     fun onShare(post: Post) {}
@@ -53,7 +52,7 @@ class PostViewHolder(
             published.text = post.published
             content.text = post.content
             likes.isChecked = post.likedByMe
-            likes.text = post.likes.toString()
+            likes.text =  "${post.likes}"//post.likes.toString()
             shares.isChecked = post.shareByMe
             shares.text = post.shareCount.toString()
             views.isChecked = post.viewByMe
@@ -61,16 +60,33 @@ class PostViewHolder(
             videoGroup.isVisible = post.video != null
 
 
-
             val url = "http://10.0.2.2:9999/avatars/${post.authorAvatar}"
-            Glide.with(binding.avatar)
-                .load(url)
-                .placeholder(R.drawable.ic_baseline_downloading_24)
-                .error(R.drawable.ic_baseline_error_24)
-                .timeout(10_000)
-                .circleCrop()
-                .into(binding.avatar)
+            val urlAttachment = "http://10.0.2.2:9999/attachment/${post.attachment?.url}"
+            if (post.authorAvatar == "") {
+                avatar.setImageResource(R.drawable.ic_baseline_add_a_photo_24)
+            } else {
+                Glide.with(binding.avatar)
+                    .load(url)
+                    .placeholder(R.drawable.ic_baseline_downloading_24)
+                    .error(R.drawable.ic_baseline_error_24)
+                    .timeout(10_000)
+                    .circleCrop()
+                    .into(binding.avatar)
+            }
 
+
+
+            if (post.attachment == null) {
+                attachment.isVisible = false
+            } else {
+                Glide.with(binding.attachment)
+                    .load(urlAttachment)
+                    .placeholder(R.drawable.ic_baseline_downloading_24)
+                    .error(R.drawable.ic_baseline_error_24)
+                    .timeout(10_000)
+                    .into(binding.attachment)
+                attachment.isVisible = true
+            }
 
 
 
@@ -102,7 +118,7 @@ class PostViewHolder(
             videoPlay.setOnClickListener {
                 onInteractionListener.onplayVideo(post)
             }
-            binding.root.setOnClickListener{
+            binding.root.setOnClickListener {
                 onInteractionListener.onPostClick(post)
             }
 

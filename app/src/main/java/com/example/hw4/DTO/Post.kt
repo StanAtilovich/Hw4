@@ -1,5 +1,6 @@
 package com.example.hw4.DTO
 
+import com.example.hw4.entity.Attachment
 
 
 data class Post(
@@ -14,7 +15,8 @@ data class Post(
     val viewByMe: Boolean = false,
     val countView: Int,
     val video: String?,
-    val authorAvatar: String
+    val authorAvatar: String,
+    val attachment: Attachment?
     )
 
 
