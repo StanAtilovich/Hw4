@@ -26,5 +26,4 @@ interface PostRepository {
         fun onError(e: Exception) {}
     }
 
-
 }
