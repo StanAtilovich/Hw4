@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.hw4.DTO.Post
 import com.example.hw4.R
 import com.example.hw4.databinding.CardPostBinding
@@ -59,6 +60,16 @@ class PostViewHolder(
             views.text = post.countView.toString()
             videoGroup.isVisible = post.video != null
 
+
+
+            val url = "http://10.0.2.2:9999/avatars/${post.authorAvatar}"
+            Glide.with(binding.avatar)
+                .load(url)
+                .placeholder(R.drawable.ic_baseline_downloading_24)
+                .error(R.drawable.ic_baseline_error_24)
+                .timeout(10_000)
+                .circleCrop()
+                .into(binding.avatar)
 
 
 
