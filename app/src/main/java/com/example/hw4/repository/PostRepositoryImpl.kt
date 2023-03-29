@@ -49,7 +49,7 @@ class PostRepositoryImpl : PostRepository {
                         )
                     }
                     override fun onFailure(call: Call<Post>, t: Throwable) {
-                        throw RuntimeException(t)
+                         callback.onError(Exception(t))
                     }
                 })
         } else {
