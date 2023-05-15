@@ -12,9 +12,10 @@ import com.example.hw4.databinding.SignUpBinding
 import com.example.hw4.viewModel.SingUpViewModel
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
 
-
+@AndroidEntryPoint
 class SingUpFragment : Fragment() {
 
     private val viewModel: SingUpViewModel by viewModels(ownerProducer = ::requireParentFragment)

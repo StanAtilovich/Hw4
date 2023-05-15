@@ -1,6 +1,6 @@
 package com.example.hw4.activity
 
-import PostViewModel
+import com.example.hw4.viewModel.PostViewModel
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri

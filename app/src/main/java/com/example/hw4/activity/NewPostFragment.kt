@@ -1,6 +1,6 @@
 package com.example.hw4.activity
 
-import PostViewModel
+import com.example.hw4.viewModel.PostViewModel
 import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater

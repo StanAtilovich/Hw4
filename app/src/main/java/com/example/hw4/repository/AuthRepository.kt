@@ -17,9 +17,9 @@ class AuthRepository @Inject constructor(
     private val apiService: ApiService
 ): AuthInterfaseRepository {
 
-   override suspend fun authUser(login: String, password: String): User {
+   override suspend fun authUser(login: String, pass: String): User {
         try {
-            val response = apiService.updateUser(login, password)
+            val response = apiService.updateUser(login, pass)
             if (!response.isSuccessful) {
                 println(R.string.youDidIt)
                 throw ApiException(response.code(), response.message())

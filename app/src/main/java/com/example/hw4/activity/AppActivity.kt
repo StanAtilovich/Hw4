@@ -25,7 +25,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     @Inject
     lateinit var appAuth: AppAuth
 
-    val authViewModel by viewModels<AuthViewModel>()
+    private val authViewModel:AuthViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         intent?.let {
@@ -79,7 +79,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                             true
                         }
 
-                        else -> false//{onMenuItemSelected(menuItem)}
+                        else -> false
                     }
 
 
@@ -94,9 +94,15 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         checkGoogleApiAvailability()
     }
 
+    @Inject
+    lateinit var firebaseMessaging: FirebaseMessaging
+
+    @Inject
+    lateinit var googleApiAvailability: GoogleApiAvailability
+
 
     private fun checkGoogleApiAvailability() {
-        with(GoogleApiAvailability.getInstance()) {
+        with(googleApiAvailability) {
             val code = isGooglePlayServicesAvailable(this@AppActivity)
             if (code == ConnectionResult.SUCCESS) {
                 return@with
@@ -108,7 +114,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             Toast.makeText(this@AppActivity, R.string.google_play_unavailable, Toast.LENGTH_LONG)
                 .show()
         }
-        FirebaseMessaging.getInstance().token.addOnSuccessListener {
+        firebaseMessaging.token.addOnSuccessListener {
             println(it)
         }
     }

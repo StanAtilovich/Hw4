@@ -10,8 +10,9 @@ import com.example.hw4.BuildConfig.BASE_URL
 import com.example.hw4.R
 import com.example.hw4.databinding.FragmentOnePhotoBinding
 import com.example.hw4.util.LongArg
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class PhotoView: Fragment() {
     companion object{
         var Bundle.textArg: String? by LongArg
