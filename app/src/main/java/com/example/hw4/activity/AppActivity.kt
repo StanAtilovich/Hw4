@@ -20,10 +20,17 @@ import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+
+
 @AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
     @Inject
     lateinit var appAuth: AppAuth
+    @Inject
+    lateinit var googleApiAvailability: GoogleApiAvailability
+    @Inject
+    lateinit var firebaseMessaging: FirebaseMessaging
+
 
     private val authViewModel:AuthViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,11 +101,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         checkGoogleApiAvailability()
     }
 
-    @Inject
-    lateinit var firebaseMessaging: FirebaseMessaging
-
-    @Inject
-    lateinit var googleApiAvailability: GoogleApiAvailability
 
 
     private fun checkGoogleApiAvailability() {

@@ -11,5 +11,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object GoogleApiAvailabilityModule {
     @Provides
-    fun provideGoogleApiAvailability(): GoogleApiAvailability{return GoogleApiAvailability.getInstance()}
+    fun provideGoogleApiAvailability(): GoogleApiAvailability {
+        return GoogleApiAvailability.getInstance()
+    }
 }

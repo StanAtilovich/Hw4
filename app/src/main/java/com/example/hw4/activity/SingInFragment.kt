@@ -23,7 +23,7 @@ class SingInFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = SingInBinding.inflate(inflater, container, false)
 
         viewModel.data.observe(viewLifecycleOwner) {

@@ -24,7 +24,7 @@ class SingUpFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val binding = SignUpBinding.inflate(inflater, container, false)
 
         viewModel.data.observe(viewLifecycleOwner) {

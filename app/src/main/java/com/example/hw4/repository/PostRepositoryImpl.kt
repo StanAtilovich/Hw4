@@ -1,6 +1,8 @@
 package com.example.hw4.repository
 
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import com.example.hw4.DTO.Media
 import com.example.hw4.DTO.MediaUpload
 import com.example.hw4.DTO.Post
@@ -9,6 +11,7 @@ import com.example.hw4.dao.PostDao
 import com.example.hw4.entity.*
 import com.example.hw4.error.ApiException
 import com.example.hw4.error.AppError
+import com.example.hw4.error.DbError
 import com.example.hw4.error.NetworkException
 import com.example.hw4.error.UnknownException
 import kotlinx.coroutines.Dispatchers
@@ -24,9 +27,14 @@ class PostRepositoryImpl @Inject constructor(
     private val dao: PostDao,
 private val apiService: ApiService,
     ) : PostRepository {
-    override val data = dao.getAll()
-        .map { it.toDto() }
-        .flowOn(Dispatchers.Default)
+    override val data = Pager(
+        config = PagingConfig(pageSize = 10, enablePlaceholders = false),
+        pagingSourceFactory = {
+            PostPagingSource(
+                apiService
+            )
+        }
+    ).flow
 
 
     override suspend fun likedById(id: Long) {
@@ -57,10 +65,10 @@ private val apiService: ApiService,
         }
     }
 
-    override fun getNewerCount(id: Long): Flow<Int> = flow {
+    override fun getNewerCount(): Flow<Int> = flow {
         while (true) {
             delay(10000L)
-            val response = apiService.getNewer(id)
+            val response = apiService.getNewer(getMaxId())
             if (!response.isSuccessful) {
                 throw ApiException(response.code(), response.message())
             }
@@ -73,6 +81,8 @@ private val apiService: ApiService,
     }
         .catch { e -> throw  AppError.from(e) }
         .flowOn(Dispatchers.Default)
+
+
 
     override suspend fun getVisible() {
         dao.getVisible()
@@ -167,4 +177,9 @@ private val apiService: ApiService,
     }
 
 
+
+
+    override suspend fun getPostById(id: Long) = dao.getPostById(id).toDto()
+
+    override suspend fun getMaxId() = dao.getPostMaxId()?.toDto()?.id ?: throw DbError
 }

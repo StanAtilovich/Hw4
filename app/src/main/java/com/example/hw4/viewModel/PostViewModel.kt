@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.example.hw4.DTO.MediaUpload
 import com.example.hw4.DTO.Post
 import com.example.hw4.auth.AppAuth
@@ -18,9 +20,12 @@ import com.example.hw4.util.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -55,24 +60,21 @@ class PostViewModel @Inject constructor(
     private val _dataState = MutableLiveData(FeedModelState())
 
 
-    val data: LiveData<FeedModel> = appAuth
+    val data: Flow<PagingData<Post>> = appAuth
         .data
         .flatMapLatest { authState ->
             repository.data
                 .map { posts ->
-                    FeedModel(posts.map {
+                    posts.map {
                         it.copy(ownedByMe = authState?.id == it.authorId)
-                    }, posts.isEmpty())
+                    }
                 }
         }
-        .asLiveData(Dispatchers.Default)
+        .flowOn(Dispatchers.Default)
 
-    val newerCount: LiveData<Int> = data.switchMap {
-        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0)
-            .catch { _dataState.postValue(FeedModelState(error = true)) }
-            .asLiveData(Dispatchers.Default)
-    }
-
+val newerCount: LiveData<Int> = repository.getNewerCount()
+    .catch { e -> e.printStackTrace()}
+    .asLiveData(Dispatchers.Default)
     val dataState: LiveData<FeedModelState>
         get() = _dataState
 
@@ -171,6 +173,7 @@ class PostViewModel @Inject constructor(
     fun clear() {
         edited.value = empty
     }
+
 
 
     fun changePhoto(uri: Uri?, file: File?) {

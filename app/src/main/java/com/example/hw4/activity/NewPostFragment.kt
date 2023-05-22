@@ -24,7 +24,6 @@ import com.example.hw4.util.StringArg
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.contracts.ExperimentalContracts
 
 
 @AndroidEntryPoint
@@ -37,7 +36,6 @@ class NewPostFragment : Fragment() {
         ownerProducer = ::requireParentFragment
     )
 
-    @OptIn(ExperimentalContracts::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

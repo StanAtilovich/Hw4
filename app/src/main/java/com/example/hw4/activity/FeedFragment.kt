@@ -12,7 +12,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hw4.DTO.Post
 import com.example.hw4.R
@@ -26,6 +28,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -37,6 +40,7 @@ class FeedFragment : Fragment() {
     private val viewModelAuth: AuthViewModel by viewModels(
         ownerProducer = ::requireParentFragment
     )
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -105,16 +109,16 @@ class FeedFragment : Fragment() {
             binding.progress.isVisible = state.loading
             binding.swipeRefreshLayout.isRefreshing = state.refreshing
             if (state.error) {
-                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.retry_loading) { viewModel.loadPosts() }
+                Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.retry_loading) {adapter.retry()} //viewModel.loadPosts() }
                     .show()
             }
         }
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            adapter.submitList(state.posts)
-            binding.errorGroup.isVisible = state.empty
+        lifecycleScope.launch {
+            viewModel.data.collectLatest {
+                adapter.submitData(it)
+            }
         }
-
 
         viewModel.newerCount.observe(viewLifecycleOwner) {
             binding.newerCount.isVisible = false
@@ -134,15 +138,20 @@ class FeedFragment : Fragment() {
             viewModel.readAll()
             binding.newerCount.isVisible = false
         }
-
+        lifecycleScope.launch {
+            adapter.loadStateFlow.collectLatest { state ->
+                binding.swipeRefreshLayout.isRefreshing = state.refresh is LoadState.Loading
+                        || state.append is LoadState.Loading
+                        || state.prepend is LoadState.Loading
+            }
+        }
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshPosts()
+            adapter.refresh()
         }
 
 
         binding.retryButton.setOnClickListener {
-            viewModel.newPostView()//loadPosts()
-            binding.retryButton.isVisible = false
+           adapter.retry()
         }
 
         viewModel.edited.observe(viewLifecycleOwner) { post ->
@@ -177,7 +186,7 @@ class FeedFragment : Fragment() {
         binding.fab.setOnClickListener {
             if (viewModelAuth.authorized) {
                 findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
-            }else{
+            } else {
                 authenticate()
             }
         }
