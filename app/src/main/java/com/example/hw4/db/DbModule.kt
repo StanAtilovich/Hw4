@@ -3,6 +3,7 @@ package com.example.hw4.db
 import android.content.Context
 import androidx.room.Room
 import com.example.hw4.dao.PostDao
+import com.example.hw4.dao.PostRemoveKeyDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +29,8 @@ class DbModule {
     fun providePostDao(
         appDb: AppDb
     ): PostDao = appDb.postDao()
+    @Provides
+    fun providePostRemoteKeyDao(db: AppDb): PostRemoveKeyDao = db.postRemoteKeyDao()
 }
 
 

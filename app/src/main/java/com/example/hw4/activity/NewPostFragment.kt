@@ -16,7 +16,6 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.example.hw4.R
 import com.example.hw4.databinding.FragmentNewPostBinding
 import com.example.hw4.util.AndroidUtils
@@ -65,11 +64,6 @@ class NewPostFragment : Fragment() {
             }
         }
 
-        viewModel.postCreated.observe(viewLifecycleOwner) {
-            viewModel.loadPosts()
-            findNavController().navigateUp()
-
-        }
 
         viewModel.photo.observe(viewLifecycleOwner){
             binding.photo.setImageURI(it.uri)

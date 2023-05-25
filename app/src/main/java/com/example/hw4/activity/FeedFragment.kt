@@ -61,7 +61,7 @@ class FeedFragment : Fragment() {
                 }
             }
 
-            override fun PhotoClick(post: Post) { //onPostClick
+            override fun PhotoClick(post: Post) {
                 findNavController().navigate(
                     R.id.action_feedFragment_to_photo,
                     Bundle().apply {
@@ -110,7 +110,7 @@ class FeedFragment : Fragment() {
             binding.swipeRefreshLayout.isRefreshing = state.refreshing
             if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry_loading) {adapter.retry()} //viewModel.loadPosts() }
+                    .setAction(R.string.retry_loading) {adapter.retry()}
                     .show()
             }
         }
@@ -120,19 +120,6 @@ class FeedFragment : Fragment() {
             }
         }
 
-        viewModel.newerCount.observe(viewLifecycleOwner) {
-            binding.newerCount.isVisible = false
-            CoroutineScope(EmptyCoroutineContext).launch {
-                viewModel.newPostView()
-                delay(25)
-            }
-            binding.post.smoothScrollToPosition(0)
-
-        }
-
-        viewModel.newerCount.observe(viewLifecycleOwner) { state ->
-            binding.newerCount.isVisible = state > 0
-        }
 
         binding.newerCount.setOnClickListener {
             viewModel.readAll()
@@ -150,9 +137,6 @@ class FeedFragment : Fragment() {
         }
 
 
-        binding.retryButton.setOnClickListener {
-           adapter.retry()
-        }
 
         viewModel.edited.observe(viewLifecycleOwner) { post ->
             if (post.id == 0L) {

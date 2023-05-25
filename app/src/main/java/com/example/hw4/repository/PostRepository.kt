@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface PostRepository {
     val data: Flow<PagingData<Post>>
-    suspend fun getAll()
     suspend fun save(post: Post)
     suspend fun saveWithAttachment(post: Post, upload: MediaUpload)
     suspend fun removeById(id: Long)
@@ -23,6 +22,5 @@ interface PostRepository {
     suspend fun readAll()
     suspend fun getPostById(id: Long): Post
     suspend fun getMaxId(): Long
-    abstract fun getNewerCount(): Flow<Int>
 
 }

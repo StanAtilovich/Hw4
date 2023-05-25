@@ -20,14 +20,9 @@ import retrofit2.http.Query
 
 
 interface ApiService {
-    @GET("posts")
-    suspend fun getAll(): Response<List<Post>>
 
     @GET("posts/latest")
     suspend fun getLatest(@Query("count") count: Int): Response<List<Post>>
-
-    @GET("posts/{postId}/newer")
-    suspend fun getNewer(@Path("postId") id: Long): Response<List<Post>>
 
     @GET("posts/{postId}/before")
     suspend fun getBefore(

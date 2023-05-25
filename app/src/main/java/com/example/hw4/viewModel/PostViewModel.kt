@@ -72,9 +72,6 @@ class PostViewModel @Inject constructor(
         }
         .flowOn(Dispatchers.Default)
 
-val newerCount: LiveData<Int> = repository.getNewerCount()
-    .catch { e -> e.printStackTrace()}
-    .asLiveData(Dispatchers.Default)
     val dataState: LiveData<FeedModelState>
         get() = _dataState
 
@@ -92,31 +89,6 @@ val newerCount: LiveData<Int> = repository.getNewerCount()
         get() = _photo
 
 
-    init {
-        loadPosts()
-    }
-
-    fun refreshPosts() = viewModelScope.launch {
-        try {
-            _dataState.value = FeedModelState(refreshing = true)
-            repository.getAll()
-            _dataState.value = FeedModelState()
-        } catch (e: Exception) {
-            _dataState.value = FeedModelState(error = true)
-        }
-    }
-
-
-    fun loadPosts() = viewModelScope.launch {
-        try {
-            _dataState.value = FeedModelState(loading = true)
-            repository.getAll()
-            _dataState.value = FeedModelState()
-            _dataState.value = FeedModelState(Shadow = true)
-        } catch (e: Exception) {
-            _dataState.value = FeedModelState(error = true)
-        }
-    }
 
     fun likeById(id: Long) = viewModelScope.launch {
         try {

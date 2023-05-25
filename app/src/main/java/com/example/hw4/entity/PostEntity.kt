@@ -65,7 +65,6 @@ data class PostEntity(
                 AttachmentEmbeddable.fromDto(dto.attachment)
             )
 
-
     }
 }
 class AttachmentEmbeddable (
