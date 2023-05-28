@@ -110,7 +110,7 @@ class FeedFragment : Fragment() {
             binding.swipeRefreshLayout.isRefreshing = state.refreshing
             if (state.error) {
                 Snackbar.make(binding.root, R.string.error_loading, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.retry_loading) {adapter.retry()}
+                    .setAction(R.string.retry_loading) { adapter.retry() }
                     .show()
             }
         }
@@ -157,13 +157,13 @@ class FeedFragment : Fragment() {
             binding.editGroup.visibility = View.INVISIBLE
         }
 
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(postitionStart: Int, itemCount: Int) {
-                if (postitionStart == 0) {
-                    binding.post.smoothScrollToPosition(0)
-                }
-            }
-        })
+        /* adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+             override fun onItemRangeInserted(postitionStart: Int, itemCount: Int) {
+                 if (postitionStart == 0) {
+                     binding.post.smoothScrollToPosition(0)
+                 }
+             }
+         })*/
 
 
 
