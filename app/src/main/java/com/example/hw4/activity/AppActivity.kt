@@ -22,6 +22,7 @@ import javax.inject.Inject
 
 
 
+
 @AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
     @Inject
