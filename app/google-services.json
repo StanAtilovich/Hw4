@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "349335056812",
+    "project_id": "hw4netology",
+    "storage_bucket": "hw4netology.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:349335056812:android:48f9e84a46528232630a09",
+        "android_client_info": {
+          "package_name": "com.example.hw4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "349335056812-vibrb3t16v1iohdbcbsbvnb7nfn52pa6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAU9Pci1czBwBpIyV0nA623ucjhpFIaa3k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "349335056812-vibrb3t16v1iohdbcbsbvnb7nfn52pa6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
