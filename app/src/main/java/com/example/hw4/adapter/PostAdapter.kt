@@ -10,8 +10,12 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.hw4.BuildConfig
+import com.example.hw4.DTO.Ad
+import com.example.hw4.DTO.FeedItem
 import com.example.hw4.DTO.Post
 import com.example.hw4.R
+import com.example.hw4.databinding.CardAdBinding
 import com.example.hw4.databinding.CardPostBinding
 
 
@@ -27,16 +31,50 @@ interface OnInteractionListener {
 
 class PostAdapter(
     private val onInteractionListener: OnInteractionListener,
-) : PagingDataAdapter<Post, PostViewHolder>(PostItemCallback()) {
+) : PagingDataAdapter<FeedItem, RecyclerView.ViewHolder>(PostItemCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val binding = (CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-        return PostViewHolder(binding, onInteractionListener)
+    override fun getItemViewType(position: Int): Int =
+        when (getItem(position)) {
+            is Ad -> R.layout.card_ad
+            is Post -> R.layout.card_post
+            null -> error("unknown item type")
+        }
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        when (viewType) {
+            R.layout.card_post -> {
+                val binding =
+                    CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                PostViewHolder(binding, onInteractionListener)
+            }
+
+            R.layout.card_ad -> {
+                val binding =
+                    CardAdBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                AdViewHolder(binding)
+            }
+
+            else -> error("unknown view type: $viewType")
+        }
+
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val item = getItem(position)) {
+            is Ad -> (holder as? AdViewHolder)?.bind(item)
+            is Post -> (holder as? PostViewHolder)?.bind(item)
+            null -> error("unknown item type")
+        }
     }
+}
 
-    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        val post = getItem(position) ?: return
-        holder.bind(post)
+class AdViewHolder(
+    private val binding: CardAdBinding,
+) : RecyclerView.ViewHolder(binding.root) {
+    fun bind(ad: Ad) {
+        Glide.with(binding.image)
+            .load("${BuildConfig.BASE_URL}/media/${ad.image}")
+            .into(binding.image)
     }
 }
 
@@ -66,23 +104,17 @@ class PostViewHolder(
             if (post.authorAvatar == "") {
                 avatar.setImageResource(R.drawable.ic_baseline_add_a_photo_24)
             } else {
-                Glide.with(binding.avatar)
-                    .load(url)
+                Glide.with(binding.avatar).load(url)
                     .placeholder(R.drawable.ic_baseline_downloading_24)
-                    .error(R.drawable.ic_baseline_error_24)
-                    .timeout(10_000)
-                    .circleCrop()
+                    .error(R.drawable.ic_baseline_error_24).timeout(10_000).circleCrop()
                     .into(binding.avatar)
             }
             if (post.attachment == null) {
                 attachment.isVisible = false//nnn
             } else {
-                Glide.with(binding.attachment)
-                    .load(urlAttachment)
+                Glide.with(binding.attachment).load(urlAttachment)
                     .placeholder(R.drawable.ic_baseline_downloading_24)
-                    .error(R.drawable.ic_baseline_error_24)
-                    .timeout(10_000)
-                    .into(binding.attachment)
+                    .error(R.drawable.ic_baseline_error_24).timeout(10_000).into(binding.attachment)
                 attachment.isVisible = true//nnn
             }
 
@@ -93,7 +125,7 @@ class PostViewHolder(
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
                     inflate(R.menu.post_menu)
-                    menu.setGroupVisible(R.id.owned,post.ownedByMe)
+                    menu.setGroupVisible(R.id.owned, post.ownedByMe)
                     setOnMenuItemClickListener { item ->
                         when (item.itemId) {
                             R.id.remove -> {
@@ -132,10 +164,14 @@ class PostViewHolder(
     }
 }
 
-class PostItemCallback : DiffUtil.ItemCallback<Post>() {
-    override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean =
-        oldItem.id == newItem.id
+class PostItemCallback : DiffUtil.ItemCallback<FeedItem>() {
+    override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        if (oldItem::class != newItem::class) {
+            return false
+        }
+        return oldItem.id == newItem.id
+    }
 
-    override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean =
+    override fun areContentsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean =
         oldItem == newItem
 }

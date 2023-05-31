@@ -4,7 +4,11 @@ package com.example.hw4.repository
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.insertSeparators
 import androidx.paging.map
+import com.example.hw4.DTO.Ad
+import com.example.hw4.DTO.FeedItem
 import com.example.hw4.DTO.Media
 import com.example.hw4.DTO.MediaUpload
 import com.example.hw4.DTO.Post
@@ -17,11 +21,13 @@ import com.example.hw4.error.ApiException
 import com.example.hw4.error.DbError
 import com.example.hw4.error.NetworkException
 import com.example.hw4.error.UnknownException
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.random.Random
 
 
 class PostRepositoryImpl @Inject constructor(
@@ -31,7 +37,7 @@ class PostRepositoryImpl @Inject constructor(
     appDb: AppDb,
 ) : PostRepository {
     @OptIn(ExperimentalPagingApi::class)
-    override val data = Pager(
+    override val data: Flow<PagingData<FeedItem>> = Pager(
         config = PagingConfig(pageSize = 10, enablePlaceholders = false),
         pagingSourceFactory = { dao.getPagingSource() },
         remoteMediator = PostRemoteMediator(
@@ -39,10 +45,16 @@ class PostRepositoryImpl @Inject constructor(
             postRemoveKeyDao = postRemoteKeyDao,
             abbDb = appDb,
         )
-    ).flow
-        .map {
-            it.map(PostEntity::toDto)
-        }
+    ).flow.map {
+        it.map(PostEntity::toDto)
+            .insertSeparators { previous, _ ->
+                if (previous?.id?.rem(5) == 0L) {
+                    Ad(Random.nextLong(), "figma.jpg")
+                } else {
+                    null
+                }
+            }
+    }
 
 
     override suspend fun likedById(id: Long) {

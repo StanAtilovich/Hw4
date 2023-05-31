@@ -9,6 +9,7 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.example.hw4.DTO.FeedItem
 import com.example.hw4.DTO.MediaUpload
 import com.example.hw4.DTO.Post
 import com.example.hw4.auth.AppAuth
@@ -51,6 +52,7 @@ private val empty = Post(
 
     )
 private val noPhoto = PhotoModel()
+
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class PostViewModel @Inject constructor(
@@ -60,13 +62,17 @@ class PostViewModel @Inject constructor(
     private val _dataState = MutableLiveData(FeedModelState())
 
 
-    val data: Flow<PagingData<Post>> = appAuth
+    val data: Flow<PagingData<FeedItem>> = appAuth
         .data
         .flatMapLatest { authState ->
             repository.data
                 .map { posts ->
-                    posts.map {
-                        it.copy(ownedByMe = authState?.id == it.authorId)
+                    posts.map { post ->
+                        if (post is Post) {
+                            post.copy(ownedByMe = authState?.id == post.authorId)
+                        } else {
+                            post
+                        }
                     }
                 }
         }
@@ -87,7 +93,6 @@ class PostViewModel @Inject constructor(
     private val _photo = MutableLiveData(noPhoto)
     val photo: LiveData<PhotoModel>
         get() = _photo
-
 
 
     fun likeById(id: Long) = viewModelScope.launch {
@@ -145,7 +150,6 @@ class PostViewModel @Inject constructor(
     fun clear() {
         edited.value = empty
     }
-
 
 
     fun changePhoto(uri: Uri?, file: File?) {
