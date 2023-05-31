@@ -4,9 +4,12 @@ package com.example.hw4.DTO
 import com.example.hw4.entity.Attachment
 import java.io.File
 
+sealed interface FeedItem {
+    val id: Long
+}
 
 data class Post(
-    val id: Long,
+    override val id: Long,
     val authorId: Long,
     val author: String,
     val content: String,
@@ -22,12 +25,13 @@ data class Post(
     val hidden: Boolean,
     val attachment: Attachment? = null,
     val ownedByMe: Boolean = false,
-)
+): FeedItem
+
+data class Ad(
+    override val id: Long,
+    val image: String,
+): FeedItem
+
 data class MediaUpload(val file: File)
 data class Media(val id: String)
-
-
-
-
-
 

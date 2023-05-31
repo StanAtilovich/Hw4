@@ -3,13 +3,17 @@ package com.example.hw4.viewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import auth.AppAuth
+import com.example.hw4.auth.AppAuth
 import com.example.hw4.model.AuthModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import okhttp3.Dispatcher
 
-class AuthViewModel: ViewModel() {
-    val data: LiveData<AuthModel?> = AppAuth.getInstance()
+import javax.inject.Inject
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    appAuth: AppAuth,
+): ViewModel() {
+    val data: LiveData<AuthModel?> = appAuth
         .data
         .asLiveData(Dispatchers.Default)
     val authorized: Boolean

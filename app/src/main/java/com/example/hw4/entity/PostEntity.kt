@@ -3,7 +3,6 @@ package com.example.hw4.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import com.example.hw4.DTO.Post
 
 
@@ -66,20 +65,19 @@ data class PostEntity(
                 AttachmentEmbeddable.fromDto(dto.attachment)
             )
 
-
     }
 }
-    class AttachmentEmbeddable (
-        var url: String,
-        var type: AttachmentType
-            ){
-        fun toDto() = Attachment(url, type)
-        companion object{
-            fun fromDto(dto: Attachment?) = dto?.let {
-                AttachmentEmbeddable(it.url, it.type)
-            }
+class AttachmentEmbeddable (
+    var url: String,
+    var type: AttachmentType
+){
+    fun toDto() = Attachment(url, type)
+    companion object{
+        fun fromDto(dto: Attachment?) = dto?.let {
+            AttachmentEmbeddable(it.url, it.type)
         }
     }
+}
 
 
 

@@ -1,11 +1,9 @@
 package com.example.hw4.error
 
-import android.accounts.NetworkErrorException
-import android.os.Message
 import java.io.IOException
 import java.sql.SQLException
 
-sealed class AppError(val code: Int, val  info: String): RuntimeException(info){
+sealed class AppError(val code: Int, info: String): RuntimeException(info){
     companion object{
         fun from(e: Throwable) = when(e){
             is IOException -> NetworkException

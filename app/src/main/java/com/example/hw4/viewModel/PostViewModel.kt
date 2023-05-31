@@ -1,23 +1,35 @@
-import android.app.Application
+package com.example.hw4.viewModel
+
 import android.net.Uri
-import androidx.lifecycle.*
-import auth.AppAuth
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.map
+import com.example.hw4.DTO.FeedItem
 import com.example.hw4.DTO.MediaUpload
 import com.example.hw4.DTO.Post
-import com.example.hw4.db.AppDb
+import com.example.hw4.auth.AppAuth
 import com.example.hw4.model.FeedModel
 import com.example.hw4.model.FeedModelState
 import com.example.hw4.model.PhotoModel
 import com.example.hw4.repository.PostRepository
-import com.example.hw4.repository.PostRepositoryImpl
 import com.example.hw4.util.SingleLiveEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.launch
 import java.io.File
+import javax.inject.Inject
 
 
 private val empty = Post(
@@ -35,33 +47,36 @@ private val empty = Post(
     video = null,
     authorAvatar = "",
     attachment = null,
-    hidden = false
-)
+    hidden = false,
+    ownedByMe = false,
+
+    )
 private val noPhoto = PhotoModel()
 
-class PostViewModel(application: Application) : AndroidViewModel(application) {
-
-
-    private val repository: PostRepository =
-        PostRepositoryImpl(AppDb.getInstance(application).postDao())
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class PostViewModel @Inject constructor(
+    private val repository: PostRepository,
+    appAuth: AppAuth,
+) : ViewModel() {
     private val _dataState = MutableLiveData(FeedModelState())
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val data: LiveData<FeedModel> = AppAuth.getInstance().data.flatMapLatest { authState ->
-        repository.data
-        .map {posts ->
-            FeedModel(posts.map {
-                it.copy(ownedByMe = authState?.id == it.authorId)
-            }, posts.isEmpty())
-        }
-    }
-        .asLiveData(Dispatchers.Default)
 
-    val newerCount: LiveData<Int> = data.switchMap {
-        repository.getNewerCount(it.posts.firstOrNull()?.id ?: 0)
-            .catch { _dataState.postValue(FeedModelState(error = true)) }
-            .asLiveData(Dispatchers.Default)
-    }
+    val data: Flow<PagingData<FeedItem>> = appAuth
+        .data
+        .flatMapLatest { authState ->
+            repository.data
+                .map { posts ->
+                    posts.map { post ->
+                        if (post is Post) {
+                            post.copy(ownedByMe = authState?.id == post.authorId)
+                        } else {
+                            post
+                        }
+                    }
+                }
+        }
+        .flowOn(Dispatchers.Default)
 
     val dataState: LiveData<FeedModelState>
         get() = _dataState
@@ -79,32 +94,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val photo: LiveData<PhotoModel>
         get() = _photo
 
-
-    init {
-        loadPosts()
-    }
-
-    fun refreshPosts() = viewModelScope.launch {
-        try {
-            _dataState.value = FeedModelState(refreshing = true)
-            repository.getAll()
-            _dataState.value = FeedModelState()
-        } catch (e: Exception) {
-            _dataState.value = FeedModelState(error = true)
-        }
-    }
-
-
-    fun loadPosts() = viewModelScope.launch {
-        try {
-            _dataState.value = FeedModelState(loading = true)
-            repository.getAll()
-            _dataState.value = FeedModelState()
-            _dataState.value = FeedModelState(Shadow = true)
-        } catch (e: Exception) {
-            _dataState.value = FeedModelState(error = true)
-        }
-    }
 
     fun likeById(id: Long) = viewModelScope.launch {
         try {
@@ -191,4 +180,3 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
 
 }
-

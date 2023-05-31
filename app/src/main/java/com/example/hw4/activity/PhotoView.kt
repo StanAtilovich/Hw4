@@ -1,6 +1,5 @@
 package com.example.hw4.activity
 
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,12 +10,13 @@ import com.example.hw4.BuildConfig.BASE_URL
 import com.example.hw4.R
 import com.example.hw4.databinding.FragmentOnePhotoBinding
 import com.example.hw4.util.LongArg
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class PhotoView: Fragment() {
     companion object{
-    var Bundle.textArg: String? by LongArg
-}
+        var Bundle.textArg: String? by LongArg
+    }
 
 
     override fun onCreateView(

@@ -2,19 +2,24 @@ package com.example.hw4.repository
 
 import com.example.hw4.DTO.User
 import com.example.hw4.R
-import com.example.hw4.api.PostsApi
+import com.example.hw4.api.ApiService
+import com.example.hw4.dao.PostDao
 import com.example.hw4.error.ApiException
 import com.example.hw4.error.NetworkException
 import com.example.hw4.error.UnknownException
 import java.io.IOException
-import kotlin.math.log
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
+class AuthRepository @Inject constructor(
+    private val postDao: PostDao,
+    private val apiService: ApiService
+): AuthInterfaseRepository {
 
-class AuthRepository {//In
-
-    suspend fun authUser(login: String, password: String): User {
+   override suspend fun authUser(login: String, pass: String): User {
         try {
-            val response = PostsApi.service.updateUser(login, password)
+            val response = apiService.updateUser(login, pass)
             if (!response.isSuccessful) {
                 println(R.string.youDidIt)
                 throw ApiException(response.code(), response.message())
@@ -29,10 +34,13 @@ class AuthRepository {//In
         }
     }
 
-    suspend fun registration(login: String,password: String,name: String):User{
+
+
+
+   override suspend fun registrationUser(login: String,password: String,name: String):User{
         try {
 
-            val response = PostsApi.service.registration(login,password,name)
+            val response = apiService.registration(login,password,name)
             if (!response.isSuccessful){
                 println(R.string.register)
                 throw ApiException(response.code(), response.message())
