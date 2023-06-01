@@ -49,10 +49,10 @@ class PostRepositoryImpl @Inject constructor(
         it.map(PostEntity::toDto)
             .insertSeparators { previous, _ ->
                 if (previous?.id?.rem(5) == 0L) {
-                    Ad(Random.nextLong(), "figma.jpg")
-                } else {
+                    Ad(Random.nextLong(), "sbercard.jpg")
+                } else
                     null
-                }
+
             }
     }
 
