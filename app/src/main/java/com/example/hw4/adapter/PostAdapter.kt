@@ -10,7 +10,6 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.hw4.BuildConfig
 import com.example.hw4.DTO.Ad
 import com.example.hw4.DTO.FeedItem
 import com.example.hw4.DTO.Post
@@ -63,7 +62,7 @@ class PostAdapter(
         when (val item = getItem(position)) {
             is Ad -> (holder as? AdViewHolder)?.bind(item)
             is Post -> (holder as? PostViewHolder)?.bind(item)
-            null -> error("unknown item type")
+            null -> error("unknown item type ")
         }
     }
 }
@@ -71,9 +70,11 @@ class PostAdapter(
 class AdViewHolder(
     private val binding: CardAdBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
+    @SuppressLint("SuspiciousIndentation")
     fun bind(ad: Ad) {
         Glide.with(binding.image)
-            .load("${BuildConfig.BASE_URL}/media/${ad.image}")
+            .load("http://10.0.2.2:9999/media/${ad.image}")
+            .timeout(30_000)
             .into(binding.image)
     }
 }
@@ -110,12 +111,12 @@ class PostViewHolder(
                     .into(binding.avatar)
             }
             if (post.attachment == null) {
-                attachment.isVisible = false//nnn
+                attachment.isVisible = false
             } else {
                 Glide.with(binding.attachment).load(urlAttachment)
                     .placeholder(R.drawable.ic_baseline_downloading_24)
                     .error(R.drawable.ic_baseline_error_24).timeout(10_000).into(binding.attachment)
-                attachment.isVisible = true//nnn
+                attachment.isVisible = true
             }
 
 

@@ -21,6 +21,8 @@ import com.example.hw4.R
 import com.example.hw4.activity.NewPostFragment.Companion.textArg
 import com.example.hw4.adapter.OnInteractionListener
 import com.example.hw4.adapter.PostAdapter
+import com.example.hw4.adapter.PostLoadingStateAdapter
+import com.example.hw4.adapter.PostLoadingViewHolder
 import com.example.hw4.databinding.FragmentFeedBinding
 import com.example.hw4.util.AndroidUtils
 import com.example.hw4.viewModel.AuthViewModel
@@ -104,7 +106,15 @@ class FeedFragment : Fragment() {
         }
 
         )
-        binding.post.adapter = adapter
+        binding.post.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = PostLoadingStateAdapter {
+                adapter.retry()
+            },
+            footer = PostLoadingStateAdapter {
+                adapter.retry()
+            }
+        )
+
         viewModel.dataState.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading
             binding.swipeRefreshLayout.isRefreshing = state.refreshing
@@ -156,16 +166,6 @@ class FeedFragment : Fragment() {
             findNavController().navigateUp()
             binding.editGroup.visibility = View.INVISIBLE
         }
-
-        /* adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-             override fun onItemRangeInserted(postitionStart: Int, itemCount: Int) {
-                 if (postitionStart == 0) {
-                     binding.post.smoothScrollToPosition(0)
-                 }
-             }
-         })*/
-
-
 
         binding.fab.setOnClickListener {
             if (viewModelAuth.authorized) {
